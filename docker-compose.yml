@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+
+    mongo:
+        container_name: mongo
+        image: mongo
+        ports:
+            - "27017:27017"
+        volumes:
+            - ./.docker/db:/data/db            
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=
+            - MONGO_INITDB_ROOT_PASSWORD=
+        restart: always
+        networks:
+            - appnetwork
+        healthcheck:
+            test: [ "CMD", "nc", "-z", "localhost", "27017" ]
+            interval: 30s
+            timeout: 10s
+            retries: 5                  
+
+    backend:
+        container_name: backend
+        env_file: 
+            - ./backend/.env.docker      
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        restart: always
+        environment:             
+            - MONGO_DATABASE=dsplits-dev
+        ports:
+            - "3333:3333"
+        volumes:             
+            - ./backend/src:/usr/src/app/src
+            - ./backend/tmp:/usr/src/app/tmp
+        depends_on:            
+            - mongo
+            - redis
+        networks:
+            - appnetwork
+
+
+    frontend:
+        container_name: frontend
+        env_file: 
+            - ./frontend/.env.docker
+        build:
+            context: ./frontend/
+            dockerfile: Dockerfile
+        volumes:
+            - ./frontend/src:/app/src
+            - /app/src/node_modules
+        ports:
+            - 3000:3000
+        depends_on: 
+            - backend
+        networks:
+            - appnetwork
+        stdin_open: true
+        
+
+    redis:
+        container_name: redis
+        image: "redis:alpine"
+        ports:
+            - "6379:6379"
+        networks:
+            - appnetwork
+
+networks:
+    appnetwork:
+        driver: bridge

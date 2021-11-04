@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        
+    </head>
+    <body>
+        <button id="start_server">Iniciar Servidor</button>
+        <button id="start_chat">Iniciar Chat</button>
+        <button id="list_chat">Listar Chats</button>
+    </body>
+    <script type="text/javascript" src="https://sandbox.boletobancario.com/boletofacil/wro/direct-checkout.min.js"></script>
+    <script type="text/javascript">
+        var checkout = new DirectCheckout('DE421365F5BD03BB0C00C75E9EAAD056B2EC4C894E20B3B12CA9F4273043F463', false);
+        /* Em sandbox utilizar o construtor new DirectCheckout('PUBLIC_TOKEN', false); */            
+      
+          var cardData = {
+              cardNumber: '5382705368860475',
+              holderName: 'Samuel dos Santos',
+              securityCode: '399',
+              expirationMonth: '08',
+              expirationYear: '2022'
+        };
+    
+        checkout.getCardHash(cardData, function(cardHash) {
+            console.log(cardHash)
+            /* Sucesso - A variável cardHash conterá o hash do cartão de crédito */
+        }, function(error) {
+            console.log(error)
+            /* Erro - A variável error conterá o erro ocorrido ao obter o hash */
+        });
+        </script>
+</html>
